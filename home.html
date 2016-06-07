@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <link href="//fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet" type="text/css">
+    <title>Force directed network of WebKit kernel class dependencies</title>
+    <style>
+        body {            
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 300;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Prepare a Dom with size (width and height) for ECharts -->
+    <div id="main" style="height:700px"></div>
+    <h2>Programming Assignment 2 - Submitted by Christopher Dambamuromo</h2>
+    <div>
+        <p>This is a network graphic for the WebKit dependencies. It shows the networks for the five major categories for the class dependencies for the WebKit kernel: HTMLElement, WebGL, SVG, CSS, and Other. The intent of the graphic is to show the deeply-interconnected nature of the WebKit kernel dependencies.
+        </p>
+
+        <p>For interaction, click the category name in the legend (top-left corner) to toggle visibility on and off. For other visualization, click the graph type in the toolbox option (top-right corner).
+        </p>        
+    </div>
+    <!-- jQuery import -->
+    <script src="js/jquery-1.12.4.min.js"></script>
+    <!-- ECharts import -->
+    <script src="js/echarts-all.js"></script>
+    <script type="text/javascript">  
+        (function(){        // Initialize after dom ready
+            var myChart = echarts.init(document.getElementById('main')); 
+            
+            option = {
+                title : {
+                    text: 'WebKit kernel class dependencies',
+                    subtext: 'Force directed network of WebKit kernel class dependencies',
+                    x:'right',
+                    y:'bottom'
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter : "{b}"
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        restore : {show: true},
+                        magicType: {
+                            show: true,
+                            type: ['force', 'chord'],
+                            option: {
+                                chord: {
+                                    minRadius : 2,
+                                    maxRadius : 10,
+                                    ribbonType: false,
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true,
+                                                rotate: true
+                                            },
+                                            chordStyle: {
+                                                opacity: 0.2
+                                            }
+                                        }
+                                    }
+                                },
+                                force: {
+                                    minRadius : 5,
+                                    maxRadius : 8,
+                                    itemStyle : {
+                                        normal : {
+                                            label: {
+                                                show: false
+                                            },
+                                            linkStyle : {
+                                                opacity : 0.5
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        saveAsImage : {show: true}
+                    }
+                },
+                legend : {
+                    text: 'Categories',
+                    data : ['HTMLElement', 'WebGL', 'SVG', 'CSS', 'Other'],
+                    orient : 'vertical',
+                    x : 'left'
+                },
+                noDataEffect: 'none',
+                series :[{
+                    //FIXME No data
+                    type: 'force',
+                }],
+            };
+
+            // Load data into the ECharts instance 
+            $.ajax({
+                url: 'data/webkit-dep.json',
+                dataType: 'json',
+                success: function (data) {
+                    option.series[0] = {
+                        type: 'force',
+                        name: 'webkit-dep',
+                        itemStyle: {
+                            normal : {
+                                linkStyle : {
+                                    opacity : 0.5
+                                }
+                            }
+                        },
+                        categories: data.categories,
+                        nodes: data.nodes,
+                        links: data.links,
+                        minRadius: 5,
+                        maxRadius: 8,
+                        gravity: 1.1,
+                        scaling: 1.2,
+                        steps: 20,
+                        large: true,
+                        useWorker: true,
+                        coolDown: 0.996,
+                        ribbonType: false
+                    };
+
+                    myChart.setOption(option);
+                    myChart.hideLoading();
+                }
+            });
+        })();  
+    </script>
+</body>
